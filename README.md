@@ -7,3 +7,5 @@ Backend for the kompello accounting application
 Backend
 * django-rest-framework json API
 * Any valid Django supported DB
+
+---
