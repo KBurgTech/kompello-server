@@ -6,7 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', os.getenv("TOTUM_SETTINGS_MODULE", "kompello.settings.dev"))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', os.getenv("TOTUM_SETTINGS_MODULE", "kompello.app.settings.dev"))
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

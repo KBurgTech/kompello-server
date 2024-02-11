@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'drf_spectacular',
+    'kompello.core'
 ]
 
 MIDDLEWARE = [
@@ -36,12 +38,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'kompello.urls'
+ROOT_URLCONF = 'kompello.app.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -54,7 +56,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'kompello.wsgi.application'
+WSGI_APPLICATION = 'kompello.app.wsgi.application'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -96,3 +98,32 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+API_RESPONSE_TYPE = 'application/json'
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ]
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Kompello Server API',
+    'DESCRIPTION': 'Kompello Server API Documentation',
+    'VERSION': '1.0.0',
+    "CONTACT": {
+        "name": "Github: Kompello",
+        "url": "https://github.com/KBurgTech/kompello-server"
+    },
+    "LICENSE": {
+        "name": "Licence: MIT",
+        "url": "https://github.com/KBurgTech/kompello-server/blob/main/LICENSE",
+    },
+    'SCHEMA_PATH_PREFIX': "/api/",
+    "COMPONENT_SPLIT_PATCH": True,
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+    },
+}
