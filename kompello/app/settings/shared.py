@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
+from .config import get_secret
+from authlib.integrations.django_client import OAuth
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -24,18 +27,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'corsheaders',
     'drf_spectacular',
-    'kompello.core'
+    'auditlog',
+    'kompello.core.apps.CoreConfig'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'kompello.core.tenant_middleware.TenantMiddleware',
 ]
 
 ROOT_URLCONF = 'kompello.app.urls'
@@ -76,6 +87,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "core.KompelloUser"
+
+AUTHLIB_OAUTH_CLIENTS = get_secret("auth.oauth_clients")
+
+OAUTH_PROVIDERS = OAuth()
+for provider in AUTHLIB_OAUTH_CLIENTS.keys():
+    OAUTH_PROVIDERS.register(provider, **AUTHLIB_OAUTH_CLIENTS[provider])
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -103,8 +121,23 @@ API_RESPONSE_TYPE = 'application/json'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication'
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
     ]
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": True,
+    "SIGNING_KEY": "complexsigningkey",
+    "ALGORITHM": "HS512",
+}
+
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
 }
 
 SPECTACULAR_SETTINGS = {
